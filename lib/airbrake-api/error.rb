@@ -12,11 +12,15 @@ module AirbrakeAPI
         else
           raise AirbrakeError.new('Invalid argument')
       end
-
-      raise AirbrakeError.new('No results found.') if results.nil?
-      raise AirbrakeError.new(results.errors.error) if results.errors
-
-      results.group || results.groups
+      if results.nil? || results.errors
+        p 'No results found or parsing error'
+        []
+      elsif results.errors
+        p 'Errors when retrieving errors'
+        []
+      else
+        results.group || results.groups
+      end
     end
 
     def self.update(error, options)

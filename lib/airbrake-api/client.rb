@@ -21,9 +21,9 @@ module AirbrakeAPI
       response = get(path, { :query => options })
       if response.code == 403
         raise AirbrakeError.new('SSL should be enabled - use AirbrakeAPI.secure = true in configuration')
+      elsif response.parsed_response.present?
+        Hashie::Mash.new(response)
       end
-
-      Hashie::Mash.new(response)
     end
 
   end
@@ -36,6 +36,9 @@ class HTTParty::Parser
   def xml
     body.gsub!(/<__utmz>.*?<\/__utmz>/m,'')
     body.gsub!(/<[0-9]+.*?>.*?<\/[0-9]+.*?>/m,'')
-    MultiXml.parse(body)
+    begin
+      MultiXml.parse(body)
+    rescue
+    end
   end
 end
